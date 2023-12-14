@@ -1,6 +1,6 @@
 # PowerShell Setup Laptop
 
-[![license](https://img.shields.io/github/license/ptavares/powershell-setup-laptop)](./LICENSE)
+![GitHub License](https://img.shields.io/github/license/ptavares/powershell-setup-terminal)
 
 ## Description 
 

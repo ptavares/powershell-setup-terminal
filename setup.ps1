@@ -227,6 +227,9 @@ Set-PSReadLineOption -EditMode Windows
 Import-Module PSFzf
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+f' -PSReadlineChordReverseHistory 'Ctrl+r'
 
+# Terraform-tools 
+Import-Module terraform-tools -DisableNameChecking
+
 # Utility Command that tells you where the absolute path of commandlets are 
 function which (`$command) { 
  Get-Command -Name `$command -ErrorAction SilentlyContinue | 
