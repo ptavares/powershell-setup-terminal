@@ -71,7 +71,7 @@ Write-Output "                  |_|                |_|            |_|    "
 Write-Output "# -------------------------------------------------------- #"
 
 
-Write-Output
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Install Scoop, a command line installer"
 Write-Output "##################################################"
@@ -84,7 +84,7 @@ else {
     scoop bucket add extras
 }
 
-Write-Output
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Install (Optional) windows package using scoop"
 Write-Output "##################################################"
@@ -99,16 +99,16 @@ if ($response -eq 'Y' -or $response -eq 'y') {
     'C:\Users\M62891\scoop\apps\pwsh\current\install-file-context.reg'
 }
 
-Write-Output
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Install local package using scoop"
 Write-Output "##################################################"
 Write-Output "-----> curl (the client url tools)"
 Update-or-Install-ScoopPackage curl
-Write-Output
+Write-Output ""
 Write-Output "-----> jq"
 Update-or-Install-ScoopPackage jq
-Write-Output
+Write-Output ""
 Write-Output "-----> Neovim (a new interesting factor of vim)"
 Update-or-Install-ScoopPackage neovim 
 
@@ -126,7 +126,7 @@ Copy-Item .\config\init.vim -Destination ~\AppData\Local\nvim\
 
 Write-Output "Don't forget to call ':PlugInstall' on first Vim launch"
 
-Write-Output
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Install Z (make navigation in PowerShell extremely easy)"
 Write-Output "##################################################"
@@ -134,7 +134,7 @@ if ( -not (Update-ModuleWin z) ) {
     Install-Module -Name z -Force
 }
 
-Write-Output
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Install terminal Icons (It gives specific Icons to windows based on file type)"
 Write-Output "##################################################"
@@ -142,7 +142,7 @@ if ( -not (Update-ModuleWin Terminal-Icons) ) {
     Install-Module -Name Terminal-Icons -Repository PSGallery
 }
 
-Write-Output
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Install PSReadLine (add autocompletion to PowerShell based on previous commands)"
 Write-Output "##################################################"
@@ -150,7 +150,7 @@ if ( -not (Update-ModuleWin PSReadLine) ) {
     Install-Module -Name PSReadLine -AllowPrerelease -Scope CurrentUser -Force -SkipPublisherCheck
 }
 
-Write-Output
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Install Fzf (Fuzzy finder and its PowerShell Module)"
 Write-Output "##################################################"
@@ -159,19 +159,19 @@ if ( -not (Update-ModuleWin PSFzf) ) {
     Install-Module -Name PSFzf -Scope CurrentUser -Force
 }
 
-Write-Output
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Install oh my posh and themes"
 Write-Output "##################################################"
 winget install JanDeDobbeleer.OhMyPosh -s winget
 
-Write-Output
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Install oh my posh custom themes"
 Write-Output "##################################################"
 Copy-Item -Path .\config\ptavares.omp.json -Destination $env:POSH_THEMES_PATH
 
-Write-Output
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Install Nerd Fonts"
 Write-Output "##################################################"
@@ -184,7 +184,15 @@ if ($response -eq 'Y' -or $response -eq 'y') {
     oh-my-posh font install --user SourceCodePro
 }
 
-Write-Output
+Write-Output ""
+Write-Output "##################################################"
+Write-Output " -> Install base64 utility"
+Write-Output "##################################################"
+if ( -not (Update-ModuleWin Base64 ) ) {
+    Install-Module -Name Base64 -Repository PSGallery
+}
+
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Install terraform-tools"
 Write-Output "##################################################"
@@ -192,49 +200,97 @@ if ( -not (Update-ModuleWin terraform-tools) ) {
     Install-Module -Name terraform-tools -Repository PSGallery
 }
 
-Write-Output
+Write-Output ""
+Write-Output "##################################################"
+Write-Output " -> Install alias-tips"
+Write-Output "##################################################"
+if ( -not (Update-ModuleWin alias-tips) ) {
+    Install-Module -Name alias-tips -Repository PSGallery -AllowClobber
+}
+
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Creating PowerShell profile if it already does not exist"
 Write-Output "##################################################"
 New-Item -Path $profile -Type File -Force
 
-Write-Output
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Configuring PowerShell profile..."
 Write-Output "##################################################"
 
 $profileConfig = @"
+###################################################################
 # Imports the terminal Icons into curernt Instance of PowerShell
+###################################################################
 Import-Module -Name Terminal-Icons
 
+###################################################################
 # Initialize Oh My Posh with the theme which we chosen
+###################################################################
 oh-my-posh init pwsh --config "`$env:POSH_THEMES_PATH\ptavares.omp.json" | Invoke-Expression
 
+###################################################################
 # Set some useful Alias to shorten typing and save some key stroke
+###################################################################
 Set-Alias vim nvim
 Set-Alias vi nvim
 Set-Alias ll ls 
 function la { ls -Force }
 function ls-lrt {ls | Sort-Object LastWriteTime -Descending }
+# List only directory
+function lsd { Get-ChildItem | Where-Object { `$_.PSIsContainer } | Format-Table -Property Name, LastWriteTime, Length -AutoSize }
+# List by size repository
+function ducks {
+    Get-ChildItem -Directory | ForEach-Object {
+        [PSCustomObject]@{
+            Path  = `$_.FullName
+            SizeMB  = (Get-ChildItem `$_.FullName -Recurse | Measure-Object Length -Sum).Sum / 1MB
+        }
+    } | Sort-Object -Property SizeMB -Descending | Select-Object -First 15
+}
+# List recursively directory
+function ll-r {
+    Get-ChildItem -Recurse | Where-Object { `$_.PSIsContainer } | ForEach-Object {
+        `$indentation = (`$_ -split '\\').Count - 1
+        `$prefix = '   ' * `$indentation + '├─'
+        `$_ | Select-Object @{Name='Path'; Expression={`$prefix + `$_.Name}}
+    }
+}
+
 Set-Alias grep findstr
 
+###########################################################################
 # Set Some Option for PSReadLine to show the history of our typed commands
+###########################################################################
 Set-PSReadLineOption -PredictionSource History 
 Set-PSReadLineOption -PredictionViewStyle ListView 
 Set-PSReadLineOption -EditMode Windows 
 
+###########################################################################
 #Fzf (Import the fuzzy finder and set a shortcut key to begin searching)
+###########################################################################
 Import-Module PSFzf
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+f' -PSReadlineChordReverseHistory 'Ctrl+r'
 
-# Terraform-tools 
+###########################################################################
+# Load Terraform-tools 
+###########################################################################
 Import-Module terraform-tools -DisableNameChecking
 
+###########################################################################
+# Load alias-tips
+###########################################################################
+Import-Module alias-tips
+
+###########################################################################
 # Utility Command that tells you where the absolute path of commandlets are 
+###########################################################################
 function which (`$command) { 
  Get-Command -Name `$command -ErrorAction SilentlyContinue | 
  Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue 
 }
+
 "@
 
 Write-ToProfile $true $profileConfig
