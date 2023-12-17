@@ -209,6 +209,14 @@ if ( -not (Update-ModuleWin alias-tips) ) {
 }
 
 Write-Output ""
+Write-Output "##################################################"xs
+Write-Output " -> Install posh-alias"
+Write-Output "##################################################"
+if ( -not (Update-ModuleWin posh-alias) ) {
+    Install-Module -Name posh-alias -Repository PSGallery
+}
+
+Write-Output ""
 Write-Output "##################################################"
 Write-Output " -> Creating PowerShell profile if it already does not exist"
 Write-Output "##################################################"
@@ -279,9 +287,10 @@ Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+f' -PSReadlineChordReverseHistory
 Import-Module terraform-tools -DisableNameChecking
 
 ###########################################################################
-# Load alias-tips
+# Load alias tools
 ###########################################################################
 Import-Module alias-tips
+Import-Module posh-alias
 
 ###########################################################################
 # Utility Command that tells you where the absolute path of commandlets are 
