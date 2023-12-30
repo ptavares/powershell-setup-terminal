@@ -108,6 +108,12 @@ Update-or-Install-ScoopPackage curl
 Write-Output ""
 Write-Output "-----> jq"
 Update-or-Install-ScoopPackage jq
+Write-Output "-----> bat"
+Update-or-Install-ScoopPackage bat
+Write-Output "-----> less"
+Update-or-Install-ScoopPackage less
+Write-Output "-----> dust"
+Update-or-Install-ScoopPackage dust
 Write-Output ""
 Write-Output "-----> Neovim (a new interesting factor of vim)"
 Update-or-Install-ScoopPackage neovim 
@@ -186,6 +192,23 @@ if ($response -eq 'Y' -or $response -eq 'y') {
 
 Write-Output ""
 Write-Output "##################################################"
+Write-Output " -> Install Some Languages"
+Write-Output "##################################################"
+$response = Read-Host "Do you want to install Python ? (Y/N)"
+if ($response -eq 'Y' -or $response -eq 'y') {
+    Update-or-Install-ScoopPackage python
+}
+$response = Read-Host "Do you want to install Golang ? (Y/N)"
+if ($response -eq 'Y' -or $response -eq 'y') {
+    Update-or-Install-ScoopPackage go
+}
+$response = Read-Host "Do you want to install AWS Cli ? (Y/N)"
+if ($response -eq 'Y' -or $response -eq 'y') {
+    Update-or-Install-ScoopPackage main/aws
+}
+
+Write-Output ""
+Write-Output "##################################################"
 Write-Output " -> Install base64 utility"
 Write-Output "##################################################"
 if ( -not (Update-ModuleWin Base64 ) ) {
@@ -243,7 +266,8 @@ oh-my-posh init pwsh --config "`$env:POSH_THEMES_PATH\ptavares.omp.json" | Invok
 ###################################################################
 Set-Alias vim nvim
 Set-Alias vi nvim
-Set-Alias ll ls 
+Set-Alias ll ls
+Set-Alias cat bat
 function la { ls -Force }
 function ls-lrt {ls | Sort-Object LastWriteTime -Descending }
 # List only directory
